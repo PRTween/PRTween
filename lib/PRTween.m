@@ -580,14 +580,14 @@ complete:
 
 #if NS_BLOCKS_AVAILABLE
 - (PRTweenOperation*)addTweenPeriod:(PRTweenPeriod *)period 
-                        updateBlock:(void (^)(PRTweenPeriod *period))updateBlock 
-                    completionBlock:(void (^)())completeBlock {
+                        updateBlock:(PRTweenUpdateBlock)updateBlock
+                    completionBlock:(PRTweenCompleteBlock)completeBlock {
     return [self addTweenPeriod:period updateBlock:updateBlock completionBlock:completeBlock timingFunction:self.defaultTimingFunction];
 }
 
 - (PRTweenOperation*)addTweenPeriod:(PRTweenPeriod *)period 
-                        updateBlock:(void (^)(PRTweenPeriod *period))anUpdateBlock 
-                    completionBlock:(void (^)())completeBlock 
+                        updateBlock:(PRTweenUpdateBlock)anUpdateBlock
+                    completionBlock:(PRTweenCompleteBlock)completeBlock
                      timingFunction:(PRTweenTimingFunction)timingFunction {
     
     PRTweenOperation *tweenOperation = [PRTweenOperation new];
@@ -669,7 +669,7 @@ complete:
             NSObject *target = tweenOperation.target;
             SEL selector = tweenOperation.updateSelector;
             
-            if (period != nil) {
+            if (period != nil && !tweenOperation.cancelled) {
                 if (target != nil && selector != NULL) {
                     [target performSelector:selector withObject:period afterDelay:0];    
                 }
@@ -678,7 +678,12 @@ complete:
                 if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_4_0) {
                     // fire off update block
                     if (tweenOperation.updateBlock != NULL) {
-                        tweenOperation.updateBlock(period);
+                        BOOL stop = NO;
+                        tweenOperation.updateBlock(period, &stop);
+                        if (stop) {
+                            tweenOperation.cancelled = YES;
+                        }
+
                     } 
                 }
             }
@@ -686,6 +691,9 @@ complete:
             if (timeOffset > period.startOffset + period.delay + period.duration) {
                 [expiredTweenOperations addObject:tweenOperation];
             }
+        }
+        if (tweenOperation.cancelled) {
+            [expiredTweenOperations addObject:tweenOperation];
         }
     }
     
@@ -696,7 +704,7 @@ complete:
         // Check to see if blocks/GCD are supported
         if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_4_0) {        
             if (tweenOperation.completeBlock != NULL) {
-                tweenOperation.completeBlock();
+                tweenOperation.completeBlock(!tweenOperation.cancelled);
             }
         }
 
