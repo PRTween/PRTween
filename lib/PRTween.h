@@ -173,6 +173,7 @@ typedef void (^PRTweenCompleteBlock)();
 - (PRTweenOperation *)addTweenPeriod:(PRTweenPeriod *)period target:(NSObject *)target selector:(SEL)selector;
 - (PRTweenOperation *)addTweenPeriod:(PRTweenPeriod *)period target:(NSObject *)target selector:(SEL)selector timingFunction:(PRTweenTimingFunction)timingFunction;
 - (void)removeTweenOperation:(PRTweenOperation*)tweenOperation;
+- (void)clearTweenOperations;
 
 #if NS_BLOCKS_AVAILABLE
 + (PRTweenOperation *)tween:(id)object property:(NSString*)property from:(CGFloat)from to:(CGFloat)to duration:(CGFloat)duration timingFunction:(PRTweenTimingFunction)timingFunction updateBlock:(PRTweenUpdateBlock)updateBlock completeBlock:(PRTweenCompleteBlock)completeBlock;

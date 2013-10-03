@@ -624,6 +624,12 @@ complete:
     }
 }
 
+- (void)clearTweenOperations
+{
+    for(PRTweenOperation *op in tweenOperations)
+        [expiredTweenOperations addObject:op];
+}
+
 + (SEL)setterFromProperty:(NSString *)property {
     return NSSelectorFromString([NSString stringWithFormat:@"set%@:", [property stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:[[property substringToIndex:1] capitalizedString]]]);
 }
@@ -721,6 +727,8 @@ complete:
     expiredTweenOperations = nil;
 
     [timer invalidate];
+    
+    [super dealloc];
 }
 
 @end
