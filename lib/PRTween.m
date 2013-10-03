@@ -277,7 +277,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundSetter = [PRTween setterFromProperty:property];
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedValue" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -293,7 +293,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundRef = ref;
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedValue" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -319,7 +319,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundSetter = [PRTween setterFromProperty:property];
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedLerp" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -338,7 +338,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundSetter = [PRTween setterFromProperty:property];
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedValue" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -354,7 +354,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundRef = ref;
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedValue" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -372,7 +372,7 @@ static NSArray *animationSelectorsForUIView = nil;
     operation.boundSetter = [PRTween setterFromProperty:property];
     [operation addObserver:[PRTween sharedInstance] forKeyPath:@"period.tweenedLerp" options:NSKeyValueObservingOptionNew context:NULL];
     
-    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0];
+    [[PRTween sharedInstance] performSelector:@selector(addTweenOperation:) withObject:operation afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     return operation;
     
 }
@@ -426,6 +426,7 @@ static NSArray *animationSelectorsForUIView = nil;
         timeOffset = 0;
         if (timer == nil) {
             timer = [NSTimer scheduledTimerWithTimeInterval:kPRTweenFramerate target:self selector:@selector(update) userInfo:nil repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         }
         self.defaultTimingFunction = &PRTweenTimingFunctionQuadInOut;
     }
@@ -677,7 +678,7 @@ complete:
             
             if (period != nil) {
                 if (target != nil && selector != NULL) {
-                    [target performSelector:selector withObject:period afterDelay:0];    
+                    [target performSelector:selector withObject:period afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
                 }
                 
                 // Check to see if blocks/GCD are supported
@@ -698,7 +699,7 @@ complete:
     // clean up expired tween operations
     for (__strong PRTweenOperation *tweenOperation in expiredTweenOperations) {
         
-        if (tweenOperation.completeSelector) [tweenOperation.target performSelector:tweenOperation.completeSelector withObject:nil afterDelay:0];
+        if (tweenOperation.completeSelector) [tweenOperation.target performSelector:tweenOperation.completeSelector withObject:nil afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
         // Check to see if blocks/GCD are supported
         if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_4_0) {        
             if (tweenOperation.completeBlock != NULL) {
